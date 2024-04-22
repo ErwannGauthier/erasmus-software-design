@@ -1,7 +1,9 @@
 ### IntelliJ IDEA ###
+.idea/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+erasmus-software-design-and-modeling.iml
 
 ### Eclipse ###
 .apt_generated
