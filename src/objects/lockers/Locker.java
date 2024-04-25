@@ -2,7 +2,7 @@ package objects.lockers;
 
 import events.EventLocker;
 import events.TypeEvent;
-import objects.Parcel;
+import objects.parcels.Parcel;
 import people.Person;
 
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class Locker {
     private final UUID id;
-    private String address;
     private final UserPanel userPanel;
+    private String address;
     private List<Slot> slots;
     private List<EventLocker> events;
     private List<Parcel> incomingParcel;
@@ -35,8 +35,16 @@ public class Locker {
         return address;
     }
 
+    private void setAddress(String address) {
+        this.address = address;
+    }
+
     public UserPanel getUserPanel() {
         return userPanel;
+    }
+
+    protected List<Slot> getSlots() {
+        return slots;
     }
 
     public void addSlot(Slot slot) {
@@ -84,12 +92,12 @@ public class Locker {
     }
 
     public void parcelInEvent(Parcel parcel, Person person) {
-        System.out.println(person.getName() + " " + person.getSurname() + " put the parcel n°" + parcel.getId() + " in the " + getAddress() + " locker.");
+        System.out.println("\t" + person.getName() + " " + person.getSurname() + " put the parcel n°" + parcel.getId() + " in the " + getAddress() + " locker.");
         this.addEvent(TypeEvent.ParcelIn, parcel, person);
     }
 
     public void parcelOutEvent(Parcel parcel, Person person) {
-        System.out.println(person.getName() + " " + person.getSurname() + " pick up the parcel n°" + parcel.getId() + " from the " + getAddress() + " locker.");
+        System.out.println("\t" + person.getName() + " " + person.getSurname() + " pick up the parcel n°" + parcel.getId() + " from the " + getAddress() + " locker.");
         this.addEvent(TypeEvent.ParcelOut, parcel, person);
     }
 
@@ -119,9 +127,9 @@ public class Locker {
         assert (isParcelInLocker(parcel));
 
         Slot slot = this.getSlotContainingParcel(parcel);
-        slot.getParcel();
+        Parcel parcelInSlot = slot.getParcel();
 
-        parcelOutEvent(parcel, person);
+        parcelOutEvent(parcelInSlot, person);
     }
 
     public List<Parcel> getParcelToDeliver() {
@@ -135,10 +143,6 @@ public class Locker {
         return parcels;
     }
 
-    private void setAddress(String address) {
-        this.address = address;
-    }
-
     public boolean isEmpty() {
         for (Slot slot : slots) {
             if (!slot.isFree()) {
@@ -150,11 +154,15 @@ public class Locker {
     }
 
     public void addToIncomingParcel(Parcel parcel) {
-        this.incomingParcel.add(parcel);
+        if (!isParcelIncoming(parcel)) {
+            this.incomingParcel.add(parcel);
+        }
     }
 
-    private void removeFromIncomingParcel(Parcel parcel) {
-        this.incomingParcel.remove(parcel);
+    public void removeFromIncomingParcel(Parcel parcel) {
+        if (isParcelIncoming(parcel)) {
+            this.incomingParcel.remove(parcel);
+        }
     }
 
     public boolean changeAddress(String address) {
@@ -215,5 +223,20 @@ public class Locker {
         }
 
         return numberOfFreeSlots > 0;
+    }
+
+    public List<Parcel> getParcelsPickUpTimeExceeded() {
+        List<Parcel> parcels = new ArrayList<Parcel>();
+        for (Slot slot : getSlots()) {
+            if (!slot.isFree() && slot.isParcelPickUpTimeExceeded()) {
+                parcels.add(slot.getParcel());
+            }
+        }
+
+        return parcels;
+    }
+
+    public boolean isParcelIncoming(Parcel parcel) {
+        return this.incomingParcel.contains(parcel);
     }
 }

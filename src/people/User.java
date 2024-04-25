@@ -1,7 +1,7 @@
 package people;
 
-import objects.Parcel;
 import objects.lockers.Locker;
+import objects.parcels.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class User extends Person {
         this.incomingParcel.add(parcel);
     }
 
-    private void removeFromIncomingParcel(Parcel parcel) {
+    public void removeFromIncomingParcel(Parcel parcel) {
         this.incomingParcel.remove(parcel);
     }
 
@@ -52,7 +52,7 @@ public class User extends Person {
             if (parcel.getSenderLocker().getUserPanel().addParcelToLocker(parcel, this)) {
                 parcelToRemove.add(parcel);
             } else {
-                System.out.println(parcel.getSender().getName() + " " + parcel.getSender().getSurname() + " can't put the parcel n°" + parcel.getId() + " in the " + parcel.getSenderLocker().getAddress() + " locker for the moment.");
+                System.out.println("\t" + parcel.getSender().getName() + " " + parcel.getSender().getSurname() + " can't put the parcel n°" + parcel.getId() + " in the " + parcel.getSenderLocker().getAddress() + " locker for the moment.");
             }
         }
 
@@ -73,5 +73,9 @@ public class User extends Person {
         for (Parcel parcel : parcelToReceive) {
             this.addToReceived(parcel);
         }
+    }
+
+    public boolean isParcelIncoming(Parcel parcel) {
+        return this.incomingParcel.contains(parcel);
     }
 }

@@ -1,6 +1,6 @@
 package objects.lockers;
 
-import objects.Parcel;
+import objects.parcels.Parcel;
 import people.Deliverer;
 import people.Person;
 
@@ -15,11 +15,21 @@ public class UserPanel {
     }
 
     private void informReceiver(Parcel parcel) {
-        parcel.getReceiver().addToIncomingParcel(parcel);
+        if (!parcel.getReceiver().isParcelIncoming(parcel)) {
+            parcel.getReceiver().addToIncomingParcel(parcel);
+        }
+    }
+
+    private void disinformReceiver(Parcel parcel) {
+        if (parcel.getReceiver().isParcelIncoming(parcel)) {
+            parcel.getReceiver().removeFromIncomingParcel(parcel);
+        }
     }
 
     private void informReceiverLocker(Parcel parcel) {
-        parcel.getReceiverLocker().addToIncomingParcel(parcel);
+        if (!parcel.getReceiverLocker().isParcelIncoming(parcel)) {
+            parcel.getReceiverLocker().addToIncomingParcel(parcel);
+        }
     }
 
     public boolean addParcelToLocker(Parcel parcel, Person person) {
@@ -49,6 +59,19 @@ public class UserPanel {
         List<Parcel> parcelsUp = locker.getParcelToDeliver();
         for (Parcel parcel : parcelsUp) {
             if (pickUpParcelFromLocker(parcel, deliverer)) {
+                parcels.add(parcel);
+            }
+        }
+
+        return parcels;
+    }
+
+    public List<Parcel> getParcelsPickUpTimeExceeded(Deliverer deliverer) {
+        List<Parcel> parcels = new ArrayList<>();
+        List<Parcel> parcelsExceeded = locker.getParcelsPickUpTimeExceeded();
+        for (Parcel parcel : parcelsExceeded) {
+            if (pickUpParcelFromLocker(parcel, deliverer)) {
+                disinformReceiver(parcel);
                 parcels.add(parcel);
             }
         }

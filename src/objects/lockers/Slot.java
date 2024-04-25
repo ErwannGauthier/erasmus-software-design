@@ -1,6 +1,6 @@
 package objects.lockers;
 
-import objects.Parcel;
+import objects.parcels.Parcel;
 import people.Person;
 
 import java.util.Date;
@@ -98,5 +98,13 @@ public class Slot {
         }
 
         return parcel.willPickUpTimeBeExceeded(date);
+    }
+
+    public boolean isParcelPickUpTimeExceeded() {
+        if (isFree()) {
+            return false;
+        }
+
+        return parcel.isPickUpTimeExceeded();
     }
 }

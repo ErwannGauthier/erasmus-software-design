@@ -1,6 +1,7 @@
-import objects.Parcel;
+import objects.lockers.ExternalStorage;
 import objects.lockers.Locker;
 import objects.lockers.Slot;
+import objects.parcels.Parcel;
 import people.Deliverer;
 import people.User;
 
@@ -81,11 +82,12 @@ public class Main {
 
     public static void main(String[] args) {
         List<User> users = generateUsers();
-        Deliverer deliverer = new Deliverer("Fast", "people.Deliverer", "DelivererFast@email.com", "deliverer");
+        Deliverer deliverer = new Deliverer("Fast", "Deliverer", "DelivererFast@email.com", "deliverer");
         List<Locker> lockers = generateLockers();
         for (Locker locker : lockers) {
             addRandomSlotToLocker(locker, 10);
         }
+        ExternalStorage externalStorage = new ExternalStorage("External Storage Address");
 
         int days = 0;
 
@@ -102,11 +104,13 @@ public class Main {
                 userRandomlySendParcel(users, lockers, user, 3);
             }
 
-            System.out.println("\npeople.Deliverer start his work...");
+            System.out.println("\nDeliverer start his work...");
             for (Locker locker : lockers) {
-                System.out.println("people.Deliverer arrive to " + locker.getAddress() + " locker.");
+                System.out.println("\nDeliverer arrive to " + locker.getAddress() + " locker.");
                 System.out.println("Deliver start to pick up parcels...");
                 deliverer.pickUpParcelToDelivery(locker);
+                System.out.println("Deliver start to pick up parcels with exceeded pick up time...");
+                deliverer.pickUpParcelsTimeExceeded(locker, externalStorage);
                 System.out.println("Deliver start to put parcels...");
                 deliverer.deliverParcelsToLocker(locker);
             }
@@ -115,6 +119,9 @@ public class Main {
             for (User user : users) {
                 user.pickUpParcels();
             }
+
+            System.out.println("\nDeliverer goes to external storage...");
+            deliverer.deliverParcelsToLocker(externalStorage);
 
             System.out.println("\nPress 'q' to quit or another key to continue.\n");
             input = scanner.nextLine();

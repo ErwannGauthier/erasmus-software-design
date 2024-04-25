@@ -1,7 +1,9 @@
 package objects.lockers;
 
-import objects.Parcel;
+import objects.parcels.Parcel;
 import people.Person;
+
+import java.util.Date;
 
 public class ExternalStorage extends Locker {
 
@@ -18,5 +20,9 @@ public class ExternalStorage extends Locker {
         slot.addParcel(parcel, person);
 
         parcelInEvent(parcel, person);
+    }
+
+    public boolean willBeAvailable(Date date) {
+        return true;
     }
 }

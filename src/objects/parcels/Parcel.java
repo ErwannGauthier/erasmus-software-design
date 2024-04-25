@@ -1,4 +1,4 @@
-package objects;
+package objects.parcels;
 
 import events.Event;
 import events.EventParcel;
@@ -44,6 +44,18 @@ public class Parcel {
         this.senderLocker = senderLocker;
         this.receiverLocker = receiverLocker;
         this.events = new ArrayList<>();
+    }
+
+    protected Parcel(Parcel parcel) {
+        this.id = parcel.id;
+        this.length = parcel.length;
+        this.width = parcel.width;
+        this.height = parcel.height;
+        this.sender = parcel.sender;
+        this.receiver = parcel.receiver;
+        this.senderLocker = parcel.senderLocker;
+        this.receiverLocker = parcel.receiverLocker;
+        this.events = parcel.events;
     }
 
     public static Parcel randomParcel(User sender, User receiver, Locker senderLocker, Locker receiverLocker) {
@@ -94,11 +106,11 @@ public class Parcel {
     }
 
     public boolean isArrived() {
-        if (events.isEmpty()) {
+        EventParcel lastEvent = getLastEvent();
+        if (lastEvent == null) {
             return false;
         }
 
-        EventParcel lastEvent = events.get(events.size() - 1);
         return lastEvent.getType() == TypeEvent.ParcelIn && lastEvent.getLockerRelatedTo() == receiverLocker;
     }
 
@@ -119,7 +131,11 @@ public class Parcel {
         return receiverLocker == locker;
     }
 
-    private EventParcel getFirstEvent() {
+    protected List<EventParcel> getEvents() {
+        return events;
+    }
+
+    protected EventParcel getFirstEvent() {
         if (events.isEmpty()) {
             return null;
         }
@@ -127,7 +143,15 @@ public class Parcel {
         return events.get(0);
     }
 
-    private EventParcel getDeliveryEvent() {
+    protected EventParcel getLastEvent() {
+        if (events.isEmpty()) {
+            return null;
+        }
+
+        return events.get(events.size() - 1);
+    }
+
+    protected EventParcel getDeliveryEvent() {
         EventParcel deliveryEvent = null;
         for (EventParcel event : events) {
             if (event.getType() == TypeEvent.ParcelIn && event.getLockerRelatedTo() == receiverLocker) {
@@ -138,12 +162,12 @@ public class Parcel {
         return deliveryEvent;
     }
 
-    private EventParcel getPickUpEvent() {
-        if (events.isEmpty()) {
+    protected EventParcel getPickUpEvent() {
+        EventParcel lastEvent = getLastEvent();
+        if (lastEvent == null) {
             return null;
         }
 
-        EventParcel lastEvent = events.get(events.size() - 1);
         if (lastEvent.getType() != TypeEvent.ParcelOut && lastEvent.getEventMaker() != receiver) {
             return null;
         }
@@ -220,11 +244,6 @@ public class Parcel {
             return null;
         }
 
-        EventParcel pickupEvent = getPickUpEvent();
-        if (pickupEvent != null) {
-            return null;
-        }
-
         int dayInMs = 24 * 60 * 60 * 1000;
         Date deliveryDate = deliveryEvent.getDate();
         return new Date(deliveryDate.getTime() + dayInMs * 2);
@@ -236,9 +255,8 @@ public class Parcel {
             return false;
         }
 
-        int dayInMs = 24 * 60 * 60 * 1000;
         Date now = new Date();
-        return (now.getTime() - maxPickupTime.getTime()) > dayInMs * 2;
+        return (maxPickupTime.getTime() - now.getTime()) < 0;
     }
 
     public boolean willPickUpTimeBeExceeded(Date date) {
@@ -247,6 +265,6 @@ public class Parcel {
             return false;
         }
 
-        return (date.getTime() - maxPickupTime.getTime()) >= 0;
+        return (maxPickupTime.getTime() - date.getTime()) < 0;
     }
 }

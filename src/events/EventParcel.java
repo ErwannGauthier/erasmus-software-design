@@ -1,7 +1,7 @@
 package events;
 
-import objects.Parcel;
 import objects.lockers.Locker;
+import objects.parcels.Parcel;
 import people.Person;
 
 public class EventParcel extends Event {
@@ -30,7 +30,7 @@ public class EventParcel extends Event {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("objects.Parcel: ").append(parcel).append("\n");
+        builder.append("objects.parcels.Parcel: ").append(parcel).append("\n");
         builder.append("\tAction: ").append(super.getType()).append("\n");
         builder.append("\tOn objects.lockers.Locker: ").append(lockerRelatedTo).append("\n");
         builder.append("\tBy: ").append(eventMaker).append("\n");
