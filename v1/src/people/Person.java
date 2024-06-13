@@ -2,7 +2,7 @@ package people;
 
 import java.util.UUID;
 
-public class Person {
+public abstract class Person {
     private final UUID id;
     private String name;
     private String surname;
